@@ -8,7 +8,7 @@
 <body>
 <div align="center">
 
-    <form th:action="@{/edit}" th:object="${user}" method="POST">
+    <form th:action="@{/admin/edit}" th:object="${user}" method="POST">
         <table border="1" cellpadding="5">
             <caption>
                 <h2>Edit User</h2>
@@ -32,11 +32,23 @@
                 <th>Password:</th>
                 <td><input type="text" name="password" th:value="*{password}"/></td>
             </tr>
+            <tr>
+                <th>Roles:</th>
+                <td>
+                    <div th:each="rl: ${roles}">
+                        <input type="checkbox" name="usrRoles"
+                               th:value="${rl.role}"
+                               th:checked="${#lists.contains(user.roles, rl)}"/>
+                        <label th:text="${rl.role}"/>
+                    </div>
+                </td>
+            </tr>
         </table>
+        <br>
         <input type="submit" value="Save"/>
     </form>
     <h3>
-        <a href="/">Back to User List</a>
+        <a href="/admin">Back to User List</a>
     </h3>
 </div>
 </body>

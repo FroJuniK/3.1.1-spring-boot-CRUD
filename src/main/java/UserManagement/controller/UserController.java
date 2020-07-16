@@ -1,11 +1,15 @@
 package UserManagement.controller;
 
+import UserManagement.model.Role;
 import UserManagement.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import UserManagement.service.UserService;
+import java.util.HashSet;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/")
@@ -19,37 +23,65 @@ public class UserController {
     }
 
     @GetMapping
-    public String allUsers(Model model) {
+    public String getStartPage(){
+        return "index";
+    }
+
+    @GetMapping("login")
+    public String getLoginPage() {
+        return "login";
+    }
+
+    @GetMapping("user")
+    public String getUserPage(@AuthenticationPrincipal User user, Model model) {
+        model.addAttribute("user", user);
+        return "user";
+    }
+
+    @GetMapping("admin")
+    public String getAllUsers(Model model) {
         model.addAttribute("users", service.getAllUsers());
         return "users";
     }
 
-    @GetMapping("add")
-    public String addUserForm() {
-        return "add";
+    @GetMapping("admin/add")
+    public String getAddUserPage(Model model) {
+        model.addAttribute("roles", service.getAllRoles());
+        return "addUser";
     }
 
-    @PostMapping("add")
-    public String addUser(@ModelAttribute User user) {
+    @PostMapping("admin/add")
+    public String addUser(@ModelAttribute User user, @RequestParam("usrRoles") Set<Role> roles) {
+        Set<Role> roleSet = new HashSet<>();
+        for (Role role : roles) {
+            roleSet.add(service.getRoleByName(role.getRole()));
+        }
+        user.setRoles(roleSet);
         service.addUser(user);
-        return "redirect:/";
+        return "redirect:/admin";
     }
 
-    @GetMapping("edit")
-    public String editUserForm(@RequestParam Long id, Model model) {
+    @GetMapping("admin/edit")
+    public String getEditUserPage(@RequestParam Long id, Model model) {
         model.addAttribute("user", service.getUserById(id));
-        return "edit";
+        model.addAttribute("roles", service.getAllRoles());
+        return "editUser";
     }
 
-    @PostMapping("edit")
-    public String editUser(@ModelAttribute User user) {
+    @PostMapping("admin/edit")
+    public String editUser(@ModelAttribute User user, @RequestParam("usrRoles") Set<Role> roles) {
+        Set<Role> roleSet = new HashSet<>();
+        for (Role role : roles) {
+            roleSet.add(service.getRoleByName(role.getRole()));
+        }
+        user.setRoles(roleSet);
         service.editUser(user);
-        return "redirect:/";
+        return "redirect:/admin";
     }
 
-    @GetMapping("delete")
+    @GetMapping("admin/delete")
     public String deleteUser(@RequestParam Long id) {
         service.deleteUser(id);
-        return "redirect:/";
+        return "redirect:/admin";
     }
 }

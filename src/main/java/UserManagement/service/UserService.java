@@ -1,5 +1,6 @@
 package UserManagement.service;
 
+import UserManagement.model.Role;
 import UserManagement.model.User;
 
 import java.util.List;
@@ -15,4 +16,8 @@ public interface UserService {
     void deleteUser(Long id);
 
     void editUser(User user);
+
+    List<Role> getAllRoles();
+
+    Role getRoleByName(String name);
 }
